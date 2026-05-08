@@ -1,1 +1,17 @@
-<p>my-profile works!</p>
+<div class="min-h-screen bg-gray-100 flex items-center justify-center">
+  <div class="w-full max-w-sm">
+    <!-- User -->
+    <div class="flex justify-center items-center mb-5">
+      Welcome user : {{ userProfile?.name ?? "" }}
+    </div>
+
+    <div class="flex justify-center mb-4">
+      <button
+        (click)="clearToken()"
+        class="border border-gray-400 bg-gray-200 px-5 py-2 text-sm rounded hover:bg-gray-300 transition"
+      >
+        logout
+      </button>
+    </div>
+  </div>
+</div>
