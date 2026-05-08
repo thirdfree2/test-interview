@@ -8,14 +8,15 @@ import (
 	"be-interview-app/internal/usecase"
 	"log"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
 
 func main() {
-	println("Hello Project")
 	cfg := config.LoadConfig()
+	
 	
 	db, err := repository.InitDB(cfg)
 	if err != nil {
@@ -29,6 +30,16 @@ func main() {
 	}
 	
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"*",
+		},
+		AllowHeaders: []string{
+			"Origin",
+			"Content-Type",
+			"Authorization",
+		},
+	}))
 
 	userRepo := repository.NewUserRepository(db)
     userUsecase := usecase.NewUserUsecase(userRepo)

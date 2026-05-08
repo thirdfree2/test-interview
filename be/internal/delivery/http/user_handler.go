@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"be-interview-app/internal/delivery/dto"
 	customError "be-interview-app/internal/delivery/error"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ func NewUserHandler(u usecase.UserUsecase) *UserHandler {
 
 // RegisterInput คือโครงสร้างของ JSON ที่รับมาจาก Client
 type RegisterInput struct {
-	Name string `json:"name" binding:"required,max=20,alphanum"`
+	Name     string `json:"name" binding:"required,max=20,alphanum"`
 	Password string `json:"password" binding:"required,max=32,password"`
 }
 
@@ -75,16 +76,17 @@ func (h *UserHandler) Register(c *gin.Context) {
 				}
 			}
 
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status": 400,
-				"errors": errorMessages,
+			c.JSON(http.StatusBadRequest, dto.BaseResponse{
+				Status:  http.StatusBadRequest,
+				Message: "invalid request",
+				Data:    errorMessages,
 			})
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": 400,
-			"message": "ข้อมูลไม่ถูกต้อง",
+		c.JSON(http.StatusBadRequest, dto.BaseResponse{
+			Status:  http.StatusBadRequest,
+			Message: "invalid request",
 		})
 		return
 	}
@@ -94,24 +96,24 @@ func (h *UserHandler) Register(c *gin.Context) {
 	if err != nil {
 
 		if errors.Is(err, customError.ErrDuplicateUser) {
-			c.JSON(http.StatusConflict, gin.H{
-				"status": 409,
-				"message": "ชื่อผู้ใช้นี้ถูกใช้แล้ว",
+			c.JSON(http.StatusConflict, dto.BaseResponse{
+				Status:  http.StatusConflict,
+				Message: "user exit",
 			})
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": 500,
-			"message": "ไม่สามารถลงทะเบียนได้",
+		c.JSON(http.StatusInternalServerError, dto.BaseResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "can't not register",
 		})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"status": 201,
-		"message": "สมัครสมาชิกสำเร็จ",
-		"data": user,
+	c.JSON(http.StatusOK, dto.BaseResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    user,
 	})
 }
 
@@ -120,9 +122,9 @@ func (h *UserHandler) GetUserProfile(c *gin.Context) {
 
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": http.StatusBadRequest,
-			"message": "invalid user id",
+		c.JSON(http.StatusBadRequest, dto.BaseResponse{
+			Status:  http.StatusBadRequest,
+			Message: "invalid user id",
 		})
 		return
 	}
@@ -132,33 +134,35 @@ func (h *UserHandler) GetUserProfile(c *gin.Context) {
 
 		// user not found
 		if errors.Is(err, customError.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"status": http.StatusNotFound,
-				"message": "ไม่พบผู้ใช้งาน",
+			c.JSON(http.StatusNotFound, dto.BaseResponse{
+				Status:  http.StatusNotFound,
+				Message: "user not found",
 			})
 			return
 		}
 
 		// internal error
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": http.StatusInternalServerError,
-			"message": "cannot get profile",
+		c.JSON(http.StatusInternalServerError, dto.BaseResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "cannot get profile",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"data": user,
+	c.JSON(http.StatusOK, dto.BaseResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    user,
 	})
-}	
+}
 
 func (h *UserHandler) GetMe(c *gin.Context) {
 
 	userIDValue, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "unauthorized",
+		c.JSON(http.StatusUnauthorized, dto.BaseResponse{
+			Status:  http.StatusUnauthorized,
+			Message: "unauthorized",
 		})
 		return
 	}
@@ -169,20 +173,24 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 	if err != nil {
 
 		if errors.Is(err, customError.ErrUserNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{
-				"message": "user not found",
+			c.JSON(http.StatusNotFound, dto.BaseResponse{
+				Status:  http.StatusNotFound,
+				Message: "user not found",
 			})
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "cannot get profile",
+		c.JSON(http.StatusInternalServerError, dto.BaseResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "cannot get profile",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": user,
+	c.JSON(http.StatusOK, dto.BaseResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    user,
 	})
 }
 
@@ -191,8 +199,9 @@ func (h *UserHandler) Login(c *gin.Context) {
 	var input LoginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "ข้อมูลไม่ถูกต้อง",
+		c.JSON(http.StatusBadRequest, dto.BaseResponse{
+			Status:  http.StatusBadRequest,
+			Message: "invalid request",
 		})
 		return
 	}
@@ -201,22 +210,23 @@ func (h *UserHandler) Login(c *gin.Context) {
 	if err != nil {
 
 		if errors.Is(err, customError.ErrInvalidCredential) {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status": 401,
-				"message": "username หรือ password ไม่ถูกต้อง",
+			c.JSON(http.StatusUnauthorized, dto.BaseResponse{
+				Status:  http.StatusUnauthorized,
+				Message: "username or password wrong",
 			})
 			return
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status": 500,
-			"message": "cannot login",
+		c.JSON(http.StatusInternalServerError, dto.BaseResponse{
+			Status:  http.StatusInternalServerError,
+			Message: "cannot login",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": 200,
-		"token": token,
+	c.JSON(http.StatusOK, dto.BaseResponse{
+		Status:  http.StatusOK,
+		Message: "success",
+		Data:    token,
 	})
 }
