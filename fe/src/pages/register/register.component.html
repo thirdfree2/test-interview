@@ -1,1 +1,69 @@
-<p>register works!</p>
+<form
+  [formGroup]="registerForm"
+  (ngSubmit)="postRegister()"
+  class="min-h-screen bg-gray-100 flex items-center justify-center"
+>
+  <div class="w-full max-w-sm">
+    <!-- User -->
+    <div class="flex items-center mb-5">
+      <label class="w-24 text-sm text-gray-700"> User </label>
+      <div>
+        <input
+          type="text"
+          formControlName="name"
+          class="w-full border border-gray-400 bg-white px-3 py-2 text-sm outline-none"
+        />
+        @if (
+          registerForm.get("name")?.touched && registerForm.get("name")?.invalid
+        ) {
+          <p class="text-red-500 text-xs mt-1">กรุณากรอกชื่อผู้ใช้</p>
+        }
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="flex items-center mb-6">
+      <label class="w-24 text-sm text-gray-700"> Password </label>
+      <div>
+        <input
+          type="password"
+          formControlName="password"
+          class="w-full border border-gray-400 bg-white px-3 py-2 text-sm outline-none"
+        />
+        @if (
+          registerForm.get("password")?.touched &&
+          registerForm.get("password")?.invalid
+        ) {
+          <p class="text-red-500 text-xs mt-1">กรุณากรอกรหัสผ่าน</p>
+        }
+      </div>
+    </div>
+
+    <div class="flex items-center mb-6">
+      <label class="w-24 text-sm text-gray-700"> Confirm Password </label>
+      <div>
+        <input
+          type="password"
+          formControlName="confirmPassword"
+          class="w-full border border-gray-400 bg-white px-3 py-2 text-sm outline-none"
+        />
+        @if (
+          registerForm.get("confirmPassword")?.touched &&
+          registerForm.get("confirmPassword")?.invalid
+        ) {
+          <p class="text-red-500 text-xs mt-1">กรุณากรอกรหัสผ่าน</p>
+        }
+      </div>
+    </div>
+
+    <!-- Button -->
+    <div class="flex justify-center mb-4">
+      <button
+        type="submit"
+        class="border border-gray-400 bg-gray-200 px-5 py-2 text-sm rounded hover:bg-gray-300 transition"
+      >
+        สมัครสมาชิก
+      </button>
+    </div>
+  </div>
+</form>
