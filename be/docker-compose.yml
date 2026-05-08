@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: gin-postgres-db
+    environment:
+      POSTGRES_USER: user_admin # ชื่อผู้ใช้
+      POSTGRES_PASSWORD: password123 # รหัสผ่าน
+      POSTGRES_DB: be-interview-app # ชื่อฐานข้อมูล
+    ports:
+      - "5432:5432" # เชื่อม Port จาก Container มาที่เครื่องเรา
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # เก็บข้อมูลไว้ถาวรแม้ปิด Container
+
+volumes:
+  postgres_data:
