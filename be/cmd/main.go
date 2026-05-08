@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+	println("Hello Project")
 	cfg := config.LoadConfig()
 	
 	db, err := repository.InitDB(cfg)
