@@ -1,7 +1,7 @@
 Run Backend
 - cd be
+- *ENV ควรจะ git ignore ไว้
 - run cmd/main.go
-*ENV ควรจะ git ignore ไว้
 
 Run Frontend
 - cd fe
